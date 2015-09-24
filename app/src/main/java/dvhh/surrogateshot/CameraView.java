@@ -11,6 +11,8 @@ import android.view.SurfaceHolder;
 import android.hardware.Camera.CameraInfo;
 import android.view.SurfaceView;
 
+import java.util.List;
+
 public class CameraView extends ActionBarActivity implements SurfaceHolder.Callback {
 
     @Override
@@ -87,10 +89,22 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
             mCamera=null;
         }
     }
+
+    private double getSizeDelta(final Camera.Size size,final int targetWidth, final int targetHeight) {
+
+    }
     private void setPreviewSize() {
         if(mCamera!=null) {
             Camera.Parameters parameters = mCamera.getParameters();
             final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
+            List<Camera.Size> localSizes = mCamera.getParameters().getSupportedPreviewSizes();
+            Camera.Size bestSize=localSizes.get(0);
+            double delta=getSizeDelta(bestSize, surfaceView.getWidth(), surfaceView.getHeight());
+            for (Camera.Size size:localSizes) {
+
+            }
+
+            //mSupportedPreviewSizes = localSizes;
 
             parameters.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
             surfaceView.requestLayout();
