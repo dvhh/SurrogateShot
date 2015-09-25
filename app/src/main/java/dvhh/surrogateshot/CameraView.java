@@ -49,6 +49,7 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
     @Override
     protected void onResume() {
         super.onResume();
+
         final SurfaceView surfaceView= (SurfaceView) findViewById(R.id.surface_camera);
         final SurfaceHolder surfaceHolder=surfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -90,8 +91,11 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
         }
     }
 
-    private double getSizeDelta(final Camera.Size size,final int targetWidth, final int targetHeight) {
+    private int getSizeDelta(final Camera.Size size,final int targetWidth, final int targetHeight) {
+        int dh = size.height - targetHeight;
+        int dw = size.width - targetWidth;
 
+        return( dh * dh + dw * dw );
     }
     private void setPreviewSize() {
         if(mCamera!=null) {
@@ -99,20 +103,24 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
             final SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
             List<Camera.Size> localSizes = mCamera.getParameters().getSupportedPreviewSizes();
             Camera.Size bestSize=localSizes.get(0);
-            double delta=getSizeDelta(bestSize, surfaceView.getWidth(), surfaceView.getHeight());
+            final int targetWidth = surfaceView.getWidth();
+            final int targetHeight = surfaceView.getHeight();
+            Log.d(getString(R.string.app_name),Integer.toString(targetWidth) + "," +Integer.toString(targetHeight));
+            int delta=Math.min(getSizeDelta(bestSize, targetWidth, targetHeight), getSizeDelta(bestSize,  targetHeight,targetWidth));
             for (Camera.Size size:localSizes) {
-
+                final int test=Math.min ( getSizeDelta(size,targetWidth,targetHeight) , getSizeDelta(size,targetHeight,targetWidth));
+                Log.d(getString(R.string.app_name),Integer.toString(size.width) + "," +Integer.toString(size.height));
+                if( test < delta ) {
+                    bestSize = size;
+                }
             }
-
+            Log.d(getString(R.string.app_name),Integer.toString(bestSize.width) + "," +Integer.toString(bestSize.height));
             //mSupportedPreviewSizes = localSizes;
 
-            parameters.setPreviewSize(surfaceView.getWidth(), surfaceView.getHeight());
+            parameters.setPreviewSize(bestSize.width, bestSize.height);
             surfaceView.requestLayout();
             mCamera.setParameters(parameters);
         }
-
-    }
-    private void Preview() {
 
     }
     @Override
@@ -138,6 +146,7 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
         //Camera camera = Camera.open(0);
         //setupCameraOrientation(camera,0);
         cameraOpen(cameraID);
+        setupCameraOrientation(mCamera,cameraID);
     }
 
     private int getDeviceRotation() {
@@ -163,6 +172,12 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
         switch (cameraID) {
             case CameraInfo.CAMERA_FACING_BACK:
                 //camera
+                camera.setDisplayOrientation( (cameraInfo.orientation - rotation +360) % 360 );
+                break;
+            case CameraInfo.CAMERA_FACING_FRONT:
+                camera.setDisplayOrientation( (360 - (cameraInfo.orientation + rotation)) % 360 );
+                break;
+
         }
     }
 }
