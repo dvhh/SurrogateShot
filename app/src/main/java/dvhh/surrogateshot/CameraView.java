@@ -3,6 +3,7 @@ package dvhh.surrogateshot;
 import android.hardware.Camera;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,14 +11,24 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.hardware.Camera.CameraInfo;
 import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.List;
 
-public class CameraView extends ActionBarActivity implements SurfaceHolder.Callback {
+public class CameraView extends AppCompatActivity implements SurfaceHolder.Callback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        //requestWindowFeature(Window.KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if(getActionBar()!=null) {
+            getActionBar().hide();
+        }
         setContentView(R.layout.activity_camera_view);
 
 
@@ -130,7 +141,10 @@ public class CameraView extends ActionBarActivity implements SurfaceHolder.Callb
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        releaseCamera();
+        startCameraPreview(holder);
         if(mCamera!=null) {
+
             setPreviewSize();
             mCamera.startPreview();
         }

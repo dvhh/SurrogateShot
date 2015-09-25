@@ -1,0 +1,29 @@
+
+
+http://stackoverflow.com/questions/14401340/live-stream-video-from-one-android-phone-to-another-over-wifi
+
+http://stackoverflow.com/questions/6116880/stream-live-video-from-phone-to-phone-using-socket-fd/
+https://github.com/Teaonly/android-eye
+http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
+
+entrey point for web server
+
+/stream
+
+send the video stream
+
+/shot
+
+take a picture
+
+params :
+
+delay
+flash
+
+
+
+/focus
+
+
+/wb
