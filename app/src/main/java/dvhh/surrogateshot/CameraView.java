@@ -1,6 +1,8 @@
 package dvhh.surrogateshot;
 
 import android.hardware.Camera;
+import android.media.MediaRecorder;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +16,9 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class CameraView extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -160,7 +165,7 @@ public class CameraView extends AppCompatActivity implements SurfaceHolder.Callb
         //Camera camera = Camera.open(0);
         //setupCameraOrientation(camera,0);
         cameraOpen(cameraID);
-        setupCameraOrientation(mCamera,cameraID);
+        setupCameraOrientation(mCamera, cameraID);
     }
 
     private int getDeviceRotation() {
@@ -192,6 +197,25 @@ public class CameraView extends AppCompatActivity implements SurfaceHolder.Callb
                 camera.setDisplayOrientation( (360 - (cameraInfo.orientation + rotation)) % 360 );
                 break;
 
+        }
+    }
+
+    public InputStream getVideoStream() throws IOException {
+        if(mCamera!=null) {
+            MediaRecorder recorder = new MediaRecorder();
+            recorder.setCamera(mCamera);
+            //recorder.setAudioSource(MediaRecorder.AudioSource.);
+            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            ParcelFileDescriptor pipe[]=ParcelFileDescriptor.createPipe();
+            recorder.setOutputFile(pipe[1].getFileDescriptor());
+            InputStream result=new FileInputStream(pipe[0].getFileDescriptor());
+            recorder.prepare();
+            recorder.start();
+            return result;
+        }else{
+            return null;
         }
     }
 }
